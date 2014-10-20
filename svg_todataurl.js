@@ -57,6 +57,7 @@ SVGElement.prototype.toDataURL = function(type, options) {
 	}
 
 	function XMLSerialize(svg) {
+	    var serialized;
 
 		// quick-n-serialize an SVG dom, needed for IE9 where there's no XMLSerializer nor SVG.xml
 		// s: SVG dom, which is the <svg> elemennt
@@ -85,11 +86,13 @@ SVGElement.prototype.toDataURL = function(type, options) {
 		
 		if (window.XMLSerializer) {
 			debug("using standard XMLSerializer.serializeToString")
-			return (new XMLSerializer()).serializeToString(svg);
+		        serialized = new XMLSerializer().serializeToString(svg);
 		} else {
 			debug("using custom XMLSerializerForIE")
-			return XMLSerializerForIE(svg);
+		        serialized = XMLSerializerForIE(svg);
 		}
+	        serialized = serialized.replace ("display: none", "display: block"); // to avoid not rendering
+	        return serialized;
 	
 	}
 
@@ -133,7 +136,7 @@ SVGElement.prototype.toDataURL = function(type, options) {
 		}
 		
 		svg_img.onerror = function() {
-			console.log(
+			debug(
 				"Can't export! Maybe your browser doesn't support " +
 				"SVG in img element or SVG input for Canvas drawImage?\n" +
 				"http://en.wikipedia.org/wiki/SVG#Native_support"
